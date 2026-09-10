@@ -3,8 +3,7 @@
 @section('title', 'SchemaLens')
 
 @section('content')
-<div
-    x-data="schemaLensDashboard(@js([
+<div    x-data="schemaLensDashboard(@js([
         'compareUrl' => route('schemalens.compare'),
         'exportUrl' => url(config('schemalens.route_prefix', 'schema-lens').'/export'),
         'migrationUrl' => route('schemalens.migration'),
