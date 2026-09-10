@@ -38,7 +38,8 @@ final class AssetController extends Controller
 
         return response($contents, 200, [
             'Content-Type' => $contentType,
-            'Cache-Control' => 'public, max-age=86400',
+            'Cache-Control' => 'public, max-age=60, must-revalidate',
+            'Last-Modified' => gmdate('D, d M Y H:i:s', filemtime($path)).' GMT',
         ]);
     }
 }

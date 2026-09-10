@@ -23,7 +23,8 @@ final class DashboardTest extends TestCase
         $response->assertOk();
         $response->assertSee('SchemaLens');
         $response->assertSee('See exactly what changed in your database.');
-        $response->assertSee('Compare Databases');
+        $response->assertSee('Compare two connections');
+        $response->assertSee('Compare');
         $response->assertDontSee('super-secret-password-do-not-leak');
     }
 

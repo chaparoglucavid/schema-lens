@@ -25,10 +25,17 @@ function schemaLensDashboard(config) {
         sql: { text: '', statements: [], has_destructive: false },
 
         activeTab: 'overview',
-        filter: 'all',
+        filter: 'changes',
         search: '',
         expanded: {},
-        filters: ['all', 'added', 'removed', 'modified', 'unchanged'],
+        filters: [
+            { id: 'changes', label: 'Changes' },
+            { id: 'added', label: 'Added' },
+            { id: 'removed', label: 'Removed' },
+            { id: 'modified', label: 'Modified' },
+            { id: 'unchanged', label: 'Unchanged' },
+            { id: 'all', label: 'All' },
+        ],
 
         get tabs() {
             const s = this.summary || {};
@@ -37,15 +44,17 @@ function schemaLensDashboard(config) {
                 { id: 'tables', label: 'Tables', count: (s.missing_tables || 0) + (s.extra_tables || 0) + (s.modified_tables || 0) },
                 { id: 'columns', label: 'Columns', count: s.column_changes || 0 },
                 { id: 'indexes', label: 'Indexes', count: s.index_changes || 0 },
-                { id: 'foreign_keys', label: 'Foreign Keys', count: s.foreign_key_changes || 0 },
-                { id: 'sql', label: 'SQL Preview', count: null },
+                { id: 'foreign_keys', label: 'FKs', count: s.foreign_key_changes || 0 },
+                { id: 'sql', label: 'SQL', count: null },
             ];
         },
 
         get filteredTables() {
             const q = (this.search || '').toLowerCase().trim();
             return (this.tables || []).filter((t) => {
-                if (this.filter !== 'all' && t.status !== this.filter) {
+                if (this.filter === 'changes') {
+                    if (t.status === 'unchanged') return false;
+                } else if (this.filter !== 'all' && t.status !== this.filter) {
                     return false;
                 }
                 if (this.activeTab === 'tables') {
@@ -72,8 +81,15 @@ function schemaLensDashboard(config) {
             });
         },
 
+        prettyType(type) {
+            return String(type || '')
+                .replace(/_/g, ' ')
+                .toLowerCase()
+                .replace(/\b\w/g, (c) => c.toUpperCase());
+        },
+
         connLabel(conn) {
-            return conn.name + (conn.driver ? ' (' + conn.driver + ')' : '');
+            return conn.name + (conn.driver ? ' · ' + conn.driver : '');
         },
 
         connMeta(name) {

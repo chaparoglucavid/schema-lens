@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" x-data="schemaLensTheme()" x-bind:class="{ 'dark': dark }" class="h-full">
+<html lang="en" x-data="schemaLensTheme()" :class="{ 'dark': dark }" class="h-full">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -12,29 +12,35 @@
             theme: {
                 extend: {
                     fontFamily: {
-                        sans: ['"IBM Plex Sans"', 'ui-sans-serif', 'system-ui', 'sans-serif'],
-                        mono: ['"IBM Plex Mono"', 'ui-monospace', 'monospace'],
-                        display: ['"Space Grotesk"', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+                        sans: ['"DM Sans"', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+                        mono: ['"JetBrains Mono"', 'ui-monospace', 'monospace'],
+                        display: ['"Outfit"', 'ui-sans-serif', 'system-ui', 'sans-serif'],
                     },
                     colors: {
-                        ink: {
-                            50: '#f4f7f7',
-                            100: '#e3eaeb',
-                            200: '#c5d3d5',
-                            300: '#9bb3b7',
-                            400: '#6d8e94',
-                            500: '#527379',
-                            600: '#455f65',
-                            700: '#3b4f54',
-                            800: '#344347',
-                            900: '#2e3a3d',
-                            950: '#1a2326',
+                        canvas: {
+                            DEFAULT: '#f7f8fa',
+                            dark: '#0c0f14',
                         },
-                        accent: {
-                            DEFAULT: '#0d9488',
-                            soft: '#14b8a6',
-                            dark: '#0f766e',
-                        }
+                        panel: {
+                            DEFAULT: '#ffffff',
+                            dark: '#12161e',
+                        },
+                        line: {
+                            DEFAULT: '#e6e9ef',
+                            dark: '#232a36',
+                        },
+                        mute: {
+                            DEFAULT: '#6b7285',
+                            dark: '#8b93a7',
+                        },
+                        brand: {
+                            DEFAULT: '#2563eb',
+                            soft: '#3b82f6',
+                            mist: '#eff4ff',
+                        },
+                    },
+                    boxShadow: {
+                        soft: '0 1px 2px rgba(15, 23, 42, 0.04), 0 8px 24px rgba(15, 23, 42, 0.04)',
                     }
                 }
             }
@@ -42,44 +48,43 @@
     </script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@400;500&family=Outfit:wght@500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ route('schemalens.assets.css') }}">
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.3/dist/cdn.min.js"></script>
     @stack('head')
 </head>
-<body class="h-full min-h-screen bg-ink-50 text-ink-900 antialiased dark:bg-ink-950 dark:text-ink-100">
-    <div class="sl-bg-pattern pointer-events-none fixed inset-0 -z-10 opacity-40 dark:opacity-30"></div>
+<body class="min-h-full bg-canvas text-slate-900 antialiased dark:bg-canvas-dark dark:text-slate-100">
+    <div class="sl-atmosphere" aria-hidden="true"></div>
 
-    <header class="sticky top-0 z-40 border-b border-ink-200/80 bg-ink-50/90 backdrop-blur-md dark:border-ink-800 dark:bg-ink-950/90">
-        <div class="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-3 sm:px-6 lg:px-8">
+    <header class="sticky top-0 z-40 border-b border-line/80 bg-canvas/80 backdrop-blur-xl dark:border-line-dark dark:bg-canvas-dark/80">
+        <div class="mx-auto flex h-14 max-w-6xl items-center justify-between px-4 sm:px-6">
             <div class="flex items-center gap-3">
-                <div class="flex h-9 w-9 items-center justify-center rounded-lg bg-accent text-white shadow-sm">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 7h18M3 12h12M3 17h8" />
-                    </svg>
+                <div class="sl-logo" aria-hidden="true">
+                    <span></span><span></span><span></span>
                 </div>
-                <div>
-                    <div class="font-display text-lg font-semibold tracking-tight">SchemaLens</div>
-                    <div class="hidden text-xs text-ink-500 dark:text-ink-400 sm:block">See exactly what changed in your database.</div>
+                <div class="leading-none">
+                    <div class="font-display text-[1.05rem] font-semibold tracking-tight">SchemaLens</div>
+                    <div class="mt-1 hidden text-[11px] text-mute dark:text-mute-dark sm:block">See exactly what changed in your database.</div>
                 </div>
             </div>
-            <div class="flex items-center gap-2">
-                <button type="button"
-                        @click="toggle()"
-                        class="inline-flex items-center gap-2 rounded-lg border border-ink-200 bg-white px-3 py-1.5 text-sm text-ink-700 transition hover:bg-ink-100 dark:border-ink-700 dark:bg-ink-900 dark:text-ink-200 dark:hover:bg-ink-800"
-                        :aria-label="dark ? 'Switch to light mode' : 'Switch to dark mode'">
-                    <span x-text="dark ? 'Light' : 'Dark'"></span>
-                </button>
-            </div>
+
+            <button type="button"
+                    @click="toggle()"
+                    class="sl-icon-btn"
+                    :title="dark ? 'Light mode' : 'Dark mode'"
+                    :aria-label="dark ? 'Switch to light mode' : 'Switch to dark mode'">
+                <svg x-show="!dark" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+                <svg x-show="dark" x-cloak xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3v2m0 14v2m9-9h-2M5 12H3m15.36 6.36l-1.42-1.42M7.05 7.05L5.64 5.64m12.72 0l-1.41 1.41M7.05 16.95l-1.41 1.41M12 8a4 4 0 100 8 4 4 0 000-8z"/></svg>
+            </button>
         </div>
     </header>
 
-    <main class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+    <main class="relative mx-auto max-w-6xl px-4 py-8 sm:px-6 sm:py-10">
         @yield('content')
     </main>
 
-    <footer class="mx-auto max-w-7xl px-4 pb-8 text-center text-xs text-ink-400 sm:px-6 lg:px-8">
-        SchemaLens is read-only by default. It never modifies your databases automatically.
+    <footer class="mx-auto max-w-6xl px-4 pb-10 text-center text-[11px] text-mute dark:text-mute-dark sm:px-6">
+        Read-only by default · SchemaLens never modifies databases automatically
     </footer>
 
     <script>
