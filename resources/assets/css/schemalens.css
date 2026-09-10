@@ -1,0 +1,164 @@
+/* SchemaLens package styles — no host npm build required */
+
+[x-cloak] { display: none !important; }
+
+.sl-bg-pattern {
+    background-image:
+        radial-gradient(ellipse 80% 50% at 20% -10%, rgba(13, 148, 136, 0.18), transparent),
+        radial-gradient(ellipse 60% 40% at 90% 10%, rgba(45, 212, 191, 0.12), transparent),
+        linear-gradient(180deg, transparent, transparent);
+}
+
+.dark .sl-bg-pattern {
+    background-image:
+        radial-gradient(ellipse 80% 50% at 20% -10%, rgba(13, 148, 136, 0.22), transparent),
+        radial-gradient(ellipse 60% 40% at 90% 10%, rgba(20, 184, 166, 0.1), transparent);
+}
+
+.sl-select,
+.sl-input {
+    border-radius: 0.5rem;
+    border: 1px solid #c5d3d5;
+    background: #fff;
+    padding: 0.55rem 0.75rem;
+    font-size: 0.875rem;
+    color: #2e3a3d;
+    outline: none;
+    transition: border-color .15s, box-shadow .15s;
+}
+
+.dark .sl-select,
+.dark .sl-input {
+    border-color: #3b4f54;
+    background: #1a2326;
+    color: #e3eaeb;
+}
+
+.sl-select:focus,
+.sl-input:focus {
+    border-color: #0d9488;
+    box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.2);
+}
+
+.sl-btn-primary {
+    border-radius: 0.5rem;
+    background: #0d9488;
+    color: #fff;
+    font-weight: 600;
+    font-size: 0.875rem;
+    padding: 0.6rem 1.1rem;
+    transition: background .15s, opacity .15s;
+}
+
+.sl-btn-primary:hover:not(:disabled) {
+    background: #0f766e;
+}
+
+.sl-btn-primary:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+}
+
+.sl-btn-ghost {
+    display: inline-flex;
+    align-items: center;
+    border-radius: 0.375rem;
+    border: 1px solid #c5d3d5;
+    background: transparent;
+    padding: 0.35rem 0.65rem;
+    font-weight: 500;
+    color: #455f65;
+    transition: background .15s;
+}
+
+.dark .sl-btn-ghost {
+    border-color: #3b4f54;
+    color: #c5d3d5;
+}
+
+.sl-btn-ghost:hover {
+    background: #e3eaeb;
+}
+
+.dark .sl-btn-ghost:hover {
+    background: #2e3a3d;
+}
+
+.sl-card {
+    border-radius: 0.9rem;
+    border: 1px solid #c5d3d5;
+    background: rgba(255, 255, 255, 0.85);
+    padding: 0.9rem 1rem;
+}
+
+.dark .sl-card {
+    border-color: #344347;
+    background: rgba(26, 35, 38, 0.7);
+}
+
+.sl-card-value {
+    font-family: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+    font-size: 1.35rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+}
+
+.sl-card-label {
+    margin-top: 0.2rem;
+    font-size: 0.65rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: #6d8e94;
+}
+
+.sl-badge {
+    display: inline-flex;
+    align-items: center;
+    border-radius: 0.25rem;
+    padding: 0.1rem 0.4rem;
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+}
+
+.sl-badge-added {
+    background: #ccfbf1;
+    color: #0f766e;
+}
+
+.sl-badge-removed {
+    background: #fee2e2;
+    color: #b91c1c;
+}
+
+.sl-badge-modified {
+    background: #fef3c7;
+    color: #b45309;
+}
+
+.sl-badge-unchanged {
+    background: #e3eaeb;
+    color: #527379;
+}
+
+.dark .sl-badge-added { background: #134e4a; color: #5eead4; }
+.dark .sl-badge-removed { background: #7f1d1d; color: #fca5a5; }
+.dark .sl-badge-modified { background: #78350f; color: #fcd34d; }
+.dark .sl-badge-unchanged { background: #2e3a3d; color: #9bb3b7; }
+
+.sl-diff-changed {
+    background: rgba(251, 191, 36, 0.25);
+    border-radius: 2px;
+    padding: 0 2px;
+}
+
+.sl-diff-dim {
+    opacity: 0.45;
+}
+
+.sl-diff-missing {
+    color: #ef4444;
+    font-weight: 600;
+}

@@ -1,0 +1,14 @@
+# Auto detect text files and perform LF normalization
+* text=auto eol=lf
+
+*.php text diff=php
+*.md text
+*.json text
+*.xml text
+*.css text
+*.js text
+
+/tests export-ignore
+/.github export-ignore
+.phpunit.result.cache export-ignore
+.phpunit.cache export-ignore
