@@ -28,7 +28,7 @@
             </p>
         </div>
 
-        <div class="grid gap-4 px-5 py-5 sm:px-7 sm:py-6 lg:grid-cols-[1fr_auto_1fr_auto] lg:items-end">
+        <div class="grid gap-4 px-5 py-5 sm:px-7 sm:py-6 md:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)_auto] md:items-end">
             <div>
                 <label class="sl-label">From <span class="font-normal text-mute">(desired)</span></label>
                 <select x-model="from" class="sl-select w-full">
@@ -39,7 +39,7 @@
                 <p class="sl-meta" x-text="connMeta(from)"></p>
             </div>
 
-            <div class="hidden h-10 items-center justify-center text-slate-300 dark:text-slate-600 lg:flex" aria-hidden="true">
+            <div class="hidden h-10 items-center justify-center text-slate-300 dark:text-slate-600 md:flex" aria-hidden="true">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M4 12h16m0 0l-5-5m5 5l-5 5"/></svg>
             </div>
 
@@ -56,7 +56,7 @@
             <button type="button"
                     @click="compare()"
                     :disabled="loading || !from || !to || from === to"
-                    class="sl-btn-primary h-10 w-full lg:w-auto">
+                    class="sl-btn-primary h-10 w-full md:w-auto">
                 <svg x-show="loading" class="h-4 w-4 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                     <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                     <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
@@ -116,7 +116,7 @@
                     <nav class="flex gap-1 overflow-x-auto pb-px" aria-label="Result tabs">
                         <template x-for="tab in tabs" :key="tab.id">
                             <button type="button"
-                                    @click="activeTab = tab.id"
+                                    @click="selectTab(tab.id)"
                                     class="sl-tab"
                                     :class="activeTab === tab.id ? 'sl-tab-active' : ''">
                                 <span x-text="tab.label"></span>

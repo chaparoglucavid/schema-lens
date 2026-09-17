@@ -135,14 +135,8 @@ function schemaLensDashboard(config) {
                 this.tables = (data.grouped && data.grouped.tables) || [];
                 this.sql = data.sql || { text: '', statements: [], has_destructive: false };
                 this.activeTab = 'overview';
+                // Accordions are intentionally collapsed by default.
                 this.expanded = {};
-
-                // Auto-expand tables with differences
-                this.tables.forEach((t) => {
-                    if (t.difference_count > 0 && t.difference_count <= 5) {
-                        this.expanded[t.name] = true;
-                    }
-                });
             } catch (e) {
                 this.error = 'Unable to reach SchemaLens. Check that you are authenticated and the route is available.';
             } finally {
@@ -152,6 +146,12 @@ function schemaLensDashboard(config) {
 
         toggleTable(name) {
             this.expanded[name] = !this.expanded[name];
+        },
+
+        selectTab(tab) {
+            this.activeTab = tab;
+            // Start every result tab with its table accordions closed.
+            this.expanded = {};
         },
 
         relevantDiffs(table) {
