@@ -29,22 +29,22 @@ function schemaLensDashboard(config) {
         search: '',
         expanded: {},
         filters: [
-            { id: 'changes', label: 'Changes' },
-            { id: 'added', label: 'Added' },
-            { id: 'removed', label: 'Removed' },
-            { id: 'modified', label: 'Modified' },
-            { id: 'unchanged', label: 'Unchanged' },
-            { id: 'all', label: 'All' },
+            { id: 'changes', label: 'Fərqlər' },
+            { id: 'added', label: 'Hədəfdə artıqdır' },
+            { id: 'removed', label: 'Hədəfdə yoxdur' },
+            { id: 'modified', label: 'Dəyişdirilib' },
+            { id: 'unchanged', label: 'Eynidir' },
+            { id: 'all', label: 'Hamısı' },
         ],
 
         get tabs() {
             const s = this.summary || {};
             return [
-                { id: 'overview', label: 'Overview', count: null },
-                { id: 'tables', label: 'Tables', count: (s.missing_tables || 0) + (s.extra_tables || 0) + (s.modified_tables || 0) },
-                { id: 'columns', label: 'Columns', count: s.column_changes || 0 },
-                { id: 'indexes', label: 'Indexes', count: s.index_changes || 0 },
-                { id: 'foreign_keys', label: 'FKs', count: s.foreign_key_changes || 0 },
+                { id: 'overview', label: 'İcmal', count: null },
+                { id: 'tables', label: 'Cədvəllər', count: (s.missing_tables || 0) + (s.extra_tables || 0) + (s.modified_tables || 0) },
+                { id: 'columns', label: 'Sütunlar', count: s.column_changes || 0 },
+                { id: 'indexes', label: 'İndekslər', count: s.index_changes || 0 },
+                { id: 'foreign_keys', label: 'Xarici açarlar', count: s.foreign_key_changes || 0 },
                 { id: 'sql', label: 'SQL', count: null },
             ];
         },
@@ -52,40 +52,110 @@ function schemaLensDashboard(config) {
         get filteredTables() {
             const q = (this.search || '').toLowerCase().trim();
             return (this.tables || []).filter((t) => {
-                if (this.filter === 'changes') {
-                    if (t.status === 'unchanged') return false;
-                } else if (this.filter !== 'all' && t.status !== this.filter) {
-                    return false;
-                }
+                const differences = t.differences || [];
+                const hasCategoryDifference = (category, prefix) => differences.some((d) =>
+                    d.category === category || (d.type || '').startsWith(prefix)
+                );
+
                 if (this.activeTab === 'tables') {
-                    // show all matching filter
+                    // Table status is applied below, after category-specific filtering.
                 } else if (this.activeTab === 'columns') {
-                    if (!t.differences.some((d) => d.category === 'columns' || (d.type || '').startsWith('COLUMN_'))) {
+                    if (!hasCategoryDifference('columns', 'COLUMN_')) {
                         if (t.status === 'unchanged') return this.filter === 'unchanged' || this.filter === 'all';
-                        // still show added/removed tables
                         if (!['added', 'removed'].includes(t.status)) return false;
                     }
                 } else if (this.activeTab === 'indexes') {
-                    if (!t.differences.some((d) => d.category === 'indexes' || (d.type || '').startsWith('INDEX_'))) {
+                    if (!hasCategoryDifference('indexes', 'INDEX_')) {
                         if (!['added', 'removed'].includes(t.status) && t.status !== 'unchanged') return false;
                         if (t.status === 'unchanged' && this.filter !== 'unchanged' && this.filter !== 'all') return false;
                         if (!['added', 'removed', 'unchanged'].includes(t.status) && this.filter === 'all') return false;
                     }
                 } else if (this.activeTab === 'foreign_keys') {
-                    if (!t.differences.some((d) => d.category === 'foreign_keys' || (d.type || '').startsWith('FOREIGN_'))) {
+                    if (!hasCategoryDifference('foreign_keys', 'FOREIGN_')) {
                         if (!['added', 'removed'].includes(t.status)) return false;
                     }
                 }
+
+                if (this.filter === 'changes' && t.status === 'unchanged') return false;
+                if (this.filter !== 'changes' && this.filter !== 'all' && t.status !== this.filter) return false;
                 if (q && !t.name.toLowerCase().includes(q)) return false;
                 return true;
             });
         },
 
         prettyType(type) {
-            return String(type || '')
-                .replace(/_/g, ' ')
-                .toLowerCase()
-                .replace(/\b\w/g, (c) => c.toUpperCase());
+            const labels = {
+                TABLE_ADDED: 'Cədvəl hədəfdə artıqdır',
+                TABLE_REMOVED: 'Cədvəl hədəfdə yoxdur',
+                TABLE_MODIFIED: 'Cədvəl dəyişdirilib',
+                COLUMN_ADDED: 'Sütun hədəfdə artıqdır',
+                COLUMN_REMOVED: 'Sütun hədəfdə yoxdur',
+                COLUMN_MODIFIED: 'Sütun dəyişdirilib',
+                INDEX_ADDED: 'İndeks hədəfdə artıqdır',
+                INDEX_REMOVED: 'İndeks hədəfdə yoxdur',
+                INDEX_MODIFIED: 'İndeks dəyişdirilib',
+                FOREIGN_KEY_ADDED: 'Xarici açar hədəfdə artıqdır',
+                FOREIGN_KEY_REMOVED: 'Xarici açar hədəfdə yoxdur',
+                FOREIGN_KEY_MODIFIED: 'Xarici açar dəyişdirilib',
+            };
+            return labels[type] || String(type || '').replace(/_/g, ' ');
+        },
+
+        statusLabel(status) {
+            const labels = {
+                added: 'Hədəfdə artıqdır',
+                removed: 'Hədəfdə yoxdur',
+                modified: 'Dəyişdirilib',
+                unchanged: 'Eynidir',
+            };
+            return labels[status] || status;
+        },
+
+        differenceMessage(diff) {
+            const object = '`' + (diff.object || '') + '`';
+            const table = '`' + (diff.table || '') + '`';
+            const messages = {
+                TABLE_ADDED: object + ' cədvəli yalnız hədəf bazada mövcuddur.',
+                TABLE_REMOVED: object + ' cədvəli hədəf bazada mövcud deyil.',
+                TABLE_MODIFIED: object + ' cədvəlinin quruluşu fərqlənir.',
+                COLUMN_ADDED: object + ' sütunu ' + table + ' cədvəlində yalnız hədəf bazada mövcuddur.',
+                COLUMN_REMOVED: object + ' sütunu ' + table + ' cədvəlində hədəf bazada yoxdur.',
+                COLUMN_MODIFIED: object + ' sütununun parametrləri fərqlənir.',
+                INDEX_ADDED: object + ' indeksi ' + table + ' cədvəlində yalnız hədəf bazada mövcuddur.',
+                INDEX_REMOVED: object + ' indeksi ' + table + ' cədvəlində hədəf bazada yoxdur.',
+                INDEX_MODIFIED: object + ' indeksinin parametrləri fərqlənir.',
+                FOREIGN_KEY_ADDED: object + ' xarici açarı ' + table + ' cədvəlində yalnız hədəf bazada mövcuddur.',
+                FOREIGN_KEY_REMOVED: object + ' xarici açarı ' + table + ' cədvəlində hədəf bazada yoxdur.',
+                FOREIGN_KEY_MODIFIED: object + ' xarici açarının parametrləri fərqlənir.',
+            };
+            return messages[diff.type] || diff.message || '';
+        },
+
+        prettyAttribute(attribute) {
+            const labels = {
+                type_definition: 'Məlumat tipi',
+                type: 'Məlumat tipi',
+                length: 'Uzunluq',
+                precision: 'Dəqiqlik',
+                scale: 'Miqyas',
+                nullable: 'Boş ola bilər',
+                default: 'Standart dəyər',
+                auto_increment: 'Avtomatik artım',
+                unsigned: 'İşarəsiz',
+                comment: 'Şərh',
+                generated: 'Hesablanan sütun',
+                columns: 'Sütunlar',
+                unique: 'Unikallıq',
+                primary: 'Əsas açar',
+                referenced_table: 'Əlaqəli cədvəl',
+                referenced_columns: 'Əlaqəli sütunlar',
+                on_delete: 'Silmə davranışı',
+                on_update: 'Yeniləmə davranışı',
+                engine: 'Mühərrik',
+                charset: 'Simvol dəsti',
+                collation: 'Çeşidləmə qaydası',
+            };
+            return labels[attribute] || String(attribute || '').replace(/_/g, ' ');
         },
 
         connLabel(conn) {
@@ -126,7 +196,7 @@ function schemaLensDashboard(config) {
                 const data = await res.json();
 
                 if (!data.ok) {
-                    this.error = data.error || 'Comparison failed.';
+                    this.error = data.error || 'Müqayisə zamanı xəta baş verdi.';
                     return;
                 }
 
@@ -138,7 +208,7 @@ function schemaLensDashboard(config) {
                 // Accordions are intentionally collapsed by default.
                 this.expanded = {};
             } catch (e) {
-                this.error = 'Unable to reach SchemaLens. Check that you are authenticated and the route is available.';
+                this.error = 'SchemaLens-ə qoşulmaq mümkün olmadı. Giriş etdiyinizi və marşrutun əlçatan olduğunu yoxlayın.';
             } finally {
                 this.loading = false;
             }
@@ -179,7 +249,7 @@ function schemaLensDashboard(config) {
 
         formatSide(side, other, which) {
             if (side === null || side === undefined) {
-                return '<span class="sl-diff-missing">MISSING</span>';
+                return '<span class="sl-diff-missing">MÖVCUD DEYİL</span>';
             }
 
             const escape = (v) => String(v)
@@ -193,8 +263,8 @@ function schemaLensDashboard(config) {
                     { key: 'nullable', label: side.nullable },
                     { key: 'default', label: side.default },
                 ];
-                if (side.auto_increment) lines.push({ key: 'auto_increment', label: 'AUTO_INCREMENT' });
-                if (side.comment) lines.push({ key: 'comment', label: 'COMMENT: ' + side.comment });
+                if (side.auto_increment) lines.push({ key: 'auto_increment', label: 'Avtomatik artım' });
+                if (side.comment) lines.push({ key: 'comment', label: 'Şərh: ' + side.comment });
 
                 return lines.map((line) => {
                     const changed = other && other[line.key] !== side[line.key];
@@ -223,7 +293,7 @@ function schemaLensDashboard(config) {
                 this.copied = true;
                 setTimeout(() => { this.copied = false; }, 1500);
             } catch (e) {
-                this.error = 'Unable to copy to clipboard.';
+                this.error = 'SQL mətnini mübadilə buferinə köçürmək mümkün olmadı.';
             }
         },
 
@@ -245,12 +315,12 @@ function schemaLensDashboard(config) {
                 });
                 const data = await res.json();
                 if (!data.ok) {
-                    this.error = data.error || 'Migration generation failed.';
+                    this.error = data.error || 'Migrasiya faylını yaratmaq mümkün olmadı.';
                     return;
                 }
-                this.migrationMessage = data.message + (data.path ? ' → ' + data.path : '');
+                this.migrationMessage = 'Migrasiya faylı yaradıldı. İşə salmazdan əvvəl diqqətlə yoxlayın.' + (data.path ? ' → ' + data.path : '');
             } catch (e) {
-                this.error = 'Unable to generate migration.';
+                this.error = 'Migrasiya faylını yaratmaq mümkün olmadı.';
             } finally {
                 this.migrating = false;
             }

@@ -21,10 +21,11 @@ final class DashboardTest extends TestCase
         $response = $this->get('/schema-lens');
 
         $response->assertOk();
+        $response->assertSee('<html lang="az"', false);
         $response->assertSee('SchemaLens');
-        $response->assertSee('See exactly what changed in your database.');
-        $response->assertSee('Compare two connections');
-        $response->assertSee('Compare');
+        $response->assertSee('Verilənlər bazası sxemlərindəki fərqləri dəqiq görün.');
+        $response->assertSee('İki verilənlər bazasının sxemini müqayisə edin');
+        $response->assertSee('Müqayisə et');
         $response->assertDontSee('super-secret-password-do-not-leak');
     }
 
